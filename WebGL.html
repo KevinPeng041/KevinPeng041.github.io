@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebGL</title>
+
+</head>
+<style>
+    body{
+        margin: 0;
+    }
+
+</style>
+<body>
+<div id="panorama"></div>
+<script src="../js/three.js"></script>
+<script>
+   let camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,1,1000);
+   camera.position.z=900;
+
+   let scene=new THREE.Scene();
+   let renderer=new THREE.WebGLRenderer();
+
+   let container=document.getElementById('panorama');
+   let geometry=new THREE.SphereGeometry(200,60,40);
+
+
+   let textureLoader=new THREE.TextureLoader();
+   textureLoader.setCrossOrigin('');
+   textureLoader.load('https://media.istockphoto.com/photos/mountain-landscape-picture-id517188688?k=20&m=517188688&s=612x612&w=0&h=i38qBm2P-6V4vZVEaMy_TaTEaoCMkYhvLCysE7yJQ5Q=',draw);
+   geometry.scale(-1,1,1);
+
+
+   function draw(texture) {
+       let material=new THREE.MeshBasicMaterial({
+          map:texture
+       });
+       let mesh=new THREE.Mesh(geometry,material);
+       scene.add(mesh);
+
+       renderer=new THREE.WebGLRenderer();
+       renderer.setPixelRatio(window.devicePixelRatio);
+       renderer.setSize(window.innerWidth,window.innerHeight);
+       container.appendChild(renderer.domElement);
+   }
+  function animate() {
+      requestAnimationFrame(animate);
+      update();
+  }
+   animate();
+
+   var lontitude = 0;
+   var latitude = 0;
+  function update() {
+      lontitude+=0.3;
+      let theta=THREE.Math.degToRad(lontitude);
+      latitude=Math.max(-85,Math.min(85,latitude));
+      let phi=THREE.Math.degToRad(90-latitude);
+
+      camera.lookAt(
+          new THREE.Vector3(
+              500*Math.sin(phi) * Math.cos(theta),
+              500*Math.cos(phi),
+              500*Math.sin(phi) * Math.sin(theta)
+          )
+      );
+      renderer.render(scene,camera);
+  }
+</script>
+</body>
+</html>
